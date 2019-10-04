@@ -6,8 +6,7 @@
 
 #define CONTINUE    0
 #define WIN         1
-#define LOSE        2
-#define DRAW        3
+#define DRAW        2
 
 void create_new_board(char board[HEIGHT][WIDTH]);
 void draw_board(char board[HEIGHT][WIDTH]);

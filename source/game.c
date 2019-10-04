@@ -77,31 +77,74 @@ int is_space_empty(char board[HEIGHT][WIDTH], int pos_x)
     return NO_EMPTY;
 }
 
-int check_game_state(char board[HEIGHT][WIDTH])
+void finished_game_message(char *message)
 {
-    // check for draw
+    printf("\n\n%s", message);
+    printf("\n\nPress (+) to exit...");
+    consoleUpdate(NULL);
+
+    while (1)
+    {
+        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+        hidScanInput();
+
+        if (kDown & KEY_PLUS) break;
+    }
+}
+
+int draw_state(char board[HEIGHT][WIDTH])
+{
     for (int i = 0; i < WIDTH; i++)
     {
         if (board[0][i] == EMPTY) break;
 
         // if its reached the end of the board.
-        if (i == WIDTH - 1)
+        if (i == WIDTH - 1) return DRAW;
+    }
+
+    return CONTINUE;
+}
+
+int win_state(char board[HEIGHT][WIDTH], char player)
+{
+    for (int i = HEIGHT-1; i >= 0; i--)
+    {
+        for (int j = 0; j < WIDTH - 3; j++)
         {
-            printf("\n\nDRAW");
-            printf("\n\nPress (+) to exit...");
-            consoleUpdate(NULL);
-
-            while (1)
+            for (int counter = 0; counter != 4; counter++)
             {
-                u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-                hidScanInput();
-
-                if (kDown & KEY_PLUS) break;
+                if (board[i][counter+j] != player) break;
+                if (counter == 3) return WIN;
             }
-            return DRAW;
         }
     }
 
+    return CONTINUE;
+}
+
+int check_game_state(char board[HEIGHT][WIDTH])
+{
+    // check for draw
+    if (draw_state(board) == DRAW)
+    {
+        finished_game_message("DRAW");
+        return DRAW;
+    }
+
+    // check for a winner
+    if (win_state(board, BLUE) == WIN)
+    {
+        finished_game_message("BLUE WON");
+        return WIN;
+    }
+
+    if (win_state(board, RED) == WIN)
+    {
+        finished_game_message("RED WON");
+        return WIN;
+    }
+
+    // if neither state met, continue.
     return CONTINUE;
 }
 
