@@ -67,17 +67,42 @@ void add_counter_to_board(char board[HEIGHT][WIDTH], char player, int pos_y, int
 
 int is_space_empty(char board[HEIGHT][WIDTH], int pos_x)
 {
-    int y = HEIGHT-1;
-
     // check for empty space from the bottom up.
-    while (y >= 0)
+    for (int y = HEIGHT; y >= 0; y--)
     {
         if (board[y][pos_x] == EMPTY) return y;
-        y--;
     }
 
     // if nothing found.
     return NO_EMPTY;
+}
+
+int check_game_state(char board[HEIGHT][WIDTH])
+{
+    // check for draw
+    for (int i = 0; i < WIDTH; i++)
+    {
+        if (board[0][i] == EMPTY) break;
+
+        // if its reached the end of the board.
+        if (i == WIDTH - 1)
+        {
+            printf("\n\nDRAW");
+            printf("\n\nPress (+) to exit...");
+            consoleUpdate(NULL);
+
+            while (1)
+            {
+                u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+                hidScanInput();
+
+                if (kDown & KEY_PLUS) break;
+            }
+            return DRAW;
+        }
+    }
+
+    return CONTINUE;
 }
 
 void start_game()
@@ -142,6 +167,9 @@ void start_game()
                 add_counter_to_board(board_grid, player_array[turn], cursor_pos_y, cursor_pos_x);
                 if (turn == PLAYER_1) turn = PLAYER_2;
                 else turn = PLAYER_1;
+
+                // exit if state is not continue (win / draw).
+                if (check_game_state(board_grid) != CONTINUE) break;
             }
         }
 

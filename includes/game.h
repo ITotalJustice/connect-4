@@ -1,13 +1,13 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#define HEIGHT  6
-#define WIDTH   7
+#define HEIGHT      6
+#define WIDTH       7
 
-#define WIN     0
-#define LOSE    1
-#define DRAW    2
-
+#define CONTINUE    0
+#define WIN         1
+#define LOSE        2
+#define DRAW        3
 
 void create_new_board(char board[HEIGHT][WIDTH]);
 void draw_board(char board[HEIGHT][WIDTH]);

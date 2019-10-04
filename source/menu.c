@@ -1,16 +1,21 @@
 #include <stdio.h>
 #include <switch.h>
 
-#include "menu.h"
 #include "game.h"
 #include "hid.h"
 
 #define MENU_LIST_MAX   3
 #define OPTION_LIST_MAX 5
 
-#define START           0
-#define OPTIONS         1
-#define QUIT            2
+#define MENU_START          0
+#define MENU_OPTIONS        1
+#define MENU_QUIT           2
+
+#define OPTIONS_P1_COLOUR   0
+#define OPTIONS_P2_COLOUR   1
+#define OPTIONS_UPDATE      2
+#define OPTIONS_SAVE_EXIT   3
+#define OPTIONS_EXIT        4
 
 
 void print_option_list(char **options, int cursor, int list_max)
@@ -54,23 +59,23 @@ void options_menu()
         {
             switch (cursor)
             {
-                case 0:
+                case OPTIONS_P1_COLOUR:
                 //player 1 colour
                 break;
 
-                case OPTIONS:
+                case OPTIONS_P2_COLOUR:
                 //player 2 colour
                 break;
 
-                case 2:
+                case OPTIONS_UPDATE:
                 //update game
                 break;
 
-                case 3:
+                case OPTIONS_SAVE_EXIT:
                 //save + exit
                 return;
 
-                case 4:
+                case OPTIONS_EXIT:
                 //exit
                 return;
             }
@@ -106,17 +111,17 @@ void main_menu()
         {
             switch (cursor)
             {
-                case START:
+                case MENU_START:
                 //new game
                 //load game
                 start_game();
                 break;
 
-                case OPTIONS:
+                case MENU_OPTIONS:
                 options_menu();
                 break;
 
-                case QUIT:
+                case MENU_QUIT:
                 // exit.
                 return;
             }
