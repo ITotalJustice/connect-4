@@ -105,7 +105,7 @@ int draw_state(char board[HEIGHT][WIDTH])
     return CONTINUE;
 }
 
-int win_state(char board[HEIGHT][WIDTH], char player)
+int horizontal_win_state(char board[HEIGHT][WIDTH], char player)
 {
     for (int i = HEIGHT-1; i >= 0; i--)
     {
@@ -114,6 +114,23 @@ int win_state(char board[HEIGHT][WIDTH], char player)
             for (int counter = 0; counter != 4; counter++)
             {
                 if (board[i][counter+j] != player) break;
+                if (counter == 3) return WIN;
+            }
+        }
+    }
+
+    return CONTINUE;
+}
+
+int vertical_win_state(char board[HEIGHT][WIDTH], char player)
+{
+    for (int i = WIDTH-1; i >= 0; i--)
+    {
+        for (int j = 0; j < HEIGHT-3; j++)
+        {
+            for (int counter = 0; counter != 4; counter++)
+            {
+                if (board[counter+j][i] != player) break;
                 if (counter == 3) return WIN;
             }
         }
@@ -131,14 +148,15 @@ int check_game_state(char board[HEIGHT][WIDTH])
         return DRAW;
     }
 
-    // check for a winner
-    if (win_state(board, BLUE) == WIN)
+    // check if blue won...
+    if (vertical_win_state(board, BLUE) == WIN || horizontal_win_state(board, BLUE) == WIN)
     {
         finished_game_message("BLUE WON");
         return WIN;
     }
 
-    if (win_state(board, RED) == WIN)
+    // check if red won...
+    if (vertical_win_state(board, RED) == WIN || horizontal_win_state(board, RED) == WIN)
     {
         finished_game_message("RED WON");
         return WIN;
