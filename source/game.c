@@ -33,6 +33,9 @@ void draw_board(char board[HEIGHT][WIDTH])
 {
     consoleClear();
 
+    printf("BLUE = O\n\n");
+    printf("RED = X\n\n\n\n");
+
     for (int i = 0; i < HEIGHT; i++)
     {
         for (int j = 0; j < WIDTH; j++)
@@ -139,6 +142,40 @@ int vertical_win_state(char board[HEIGHT][WIDTH], char player)
     return CONTINUE;
 }
 
+int left_diagonal_win_state(char board[HEIGHT][WIDTH], char player)
+{
+    for (int i = HEIGHT-1; i >= 0; i--)
+    {
+        for (int j = 0; j < WIDTH-3; j++)
+        {
+            for (int counter = 0; counter != 4; counter++)
+            {
+                if (board[i-counter][counter+j] != player) break;
+                if (counter == 3) return WIN;
+            }
+        }
+    }
+
+    return CONTINUE;
+}
+
+int right_diagonal_win_state(char board[HEIGHT][WIDTH], char player)
+{
+    for (int i = HEIGHT-1; i >= 0; i--)
+    {
+        for (int j = WIDTH-1; j > 2; j--)
+        {
+            for (int counter = 0; counter != 4; counter++)
+            {
+                if (board[i-counter][j-counter] != player) break;
+                if (counter == 3) return WIN;
+            }
+        }
+    }
+    
+    return CONTINUE;
+}
+
 int check_game_state(char board[HEIGHT][WIDTH])
 {
     // check for draw
@@ -149,14 +186,14 @@ int check_game_state(char board[HEIGHT][WIDTH])
     }
 
     // check if blue won...
-    if (vertical_win_state(board, BLUE) == WIN || horizontal_win_state(board, BLUE) == WIN)
+    if (vertical_win_state(board, BLUE) == WIN || horizontal_win_state(board, BLUE) == WIN || left_diagonal_win_state(board, BLUE) == WIN || right_diagonal_win_state(board, BLUE) == WIN)
     {
         finished_game_message("BLUE WON");
         return WIN;
     }
 
     // check if red won...
-    if (vertical_win_state(board, RED) == WIN || horizontal_win_state(board, RED) == WIN)
+    if (vertical_win_state(board, RED) == WIN || horizontal_win_state(board, RED) == WIN || left_diagonal_win_state(board, RED) == WIN || right_diagonal_win_state(board, RED) == WIN)
     {
         finished_game_message("RED WON");
         return WIN;
