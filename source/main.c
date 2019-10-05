@@ -2,6 +2,7 @@
 #include <switch.h>
 
 #include "menu.h"
+#include "sdl.h"
 
 
 void appInit()
@@ -10,7 +11,9 @@ void appInit()
     socketInitializeDefault();
     nxlinkStdio();
     #endif
-    consoleInit(NULL);
+    plInitialize();
+    sdlInit();
+    //consoleInit(NULL);
 }
 
 void appExit()
@@ -18,14 +21,16 @@ void appExit()
     #ifdef DEBUG
     socketExit();
     #endif
-    consoleExit(NULL);
+    plExit();
+    sdlExit();
+    //consoleExit(NULL);
 }
 
 int main(int arc, char **argv)
 {
     // init everything for the app.
     appInit();
-
+    
     // start main menu.
     main_menu();
 

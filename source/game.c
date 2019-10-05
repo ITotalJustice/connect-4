@@ -3,11 +3,16 @@
 
 #include "game.h"
 #include "menu.h"
+#include "sdl.h"
 #include "hid.h"
 
-#define BLUE        'O'
-#define RED         'X'
+#define YELLOW      'X'
+#define RED         'O'
 #define EMPTY       ' '
+
+#define CONTINUE    0
+#define WIN         1
+#define TIE         2
 
 #define PLAYER_1    0
 #define PLAYER_2    1
@@ -31,26 +36,29 @@ void create_new_board(char board[HEIGHT][WIDTH])
 
 void draw_board(char board[HEIGHT][WIDTH])
 {
-    consoleClear();
+    SDL_ClearRenderer();
 
-    printf("BLUE = O\n\n");
-    printf("RED = X\n\n\n\n");
+    SDL_DrawShape(grey, 25, 25, 200, 40);
+    SDL_DrawText(fntSmall, 25, 25, yellow, "PLAYER 1");
+    SDL_DrawShape(grey, 25, 75, 200, 40);
+    SDL_DrawText(fntSmall, 25, 75, red, "PLAYER 2");
 
-    for (int i = 0; i < HEIGHT; i++)
+    SDL_DrawShape(blue, 280, 120, 700, 470);
+
+    for (int i = 0, nl = 140; i < HEIGHT; i++, nl+=75)
     {
-        for (int j = 0; j < WIDTH; j++)
+        for (int j = 0, wl = 300; j < WIDTH; j++, wl+=100)
         {
-            printf("|%c", board[i][j]);
-        }
-        printf("|\n");
-        for (int j = 0; j < WIDTH; j++)
-        {
-            printf("--");
-        }
-        printf("-\n");
-    }
+            if (board[i][j] == EMPTY)
+            SDL_DrawShape(white, wl, nl, 50, 50);
 
-    consoleUpdate(NULL);
+            else if (board[i][j] == YELLOW)
+            SDL_DrawShape(yellow, wl, nl, 50, 50);
+
+            else
+            SDL_DrawShape(red, wl, nl, 50, 50);
+        }
+    }
 }
 
 void show_cursor_position(char board[HEIGHT][WIDTH], char player, int pos_y, int pos_x)
@@ -58,6 +66,7 @@ void show_cursor_position(char board[HEIGHT][WIDTH], char player, int pos_y, int
     // add the counter to the board.
     board[pos_y][pos_x] = player;
     draw_board(board);
+    SDL_UpdateRenderer();
     // remove it after displaying the board.
     board[pos_y][pos_x] = EMPTY;
 }
@@ -66,6 +75,7 @@ void add_counter_to_board(char board[HEIGHT][WIDTH], char player, int pos_y, int
 {
     board[pos_y][pos_x] = player;
     draw_board(board);
+    SDL_UpdateRenderer();
 }
 
 int is_space_empty(char board[HEIGHT][WIDTH], int pos_x)
@@ -76,15 +86,16 @@ int is_space_empty(char board[HEIGHT][WIDTH], int pos_x)
         if (board[y][pos_x] == EMPTY) return y;
     }
 
-    // if nothing found.
+    // if no empty space found.
     return NO_EMPTY;
 }
 
 void finished_game_message(char *message)
 {
-    printf("\n\n%s", message);
-    printf("\n\nPress (+) to exit...");
-    consoleUpdate(NULL);
+    SDL_DrawText(fntSmall, 25, 625, black, message);
+    SDL_DrawText(fntSmall, 25, 675, black, "Press (+) to exit...");
+
+    SDL_UpdateRenderer();
 
     while (1)
     {
@@ -95,14 +106,14 @@ void finished_game_message(char *message)
     }
 }
 
-int draw_state(char board[HEIGHT][WIDTH])
+int tie_state(char board[HEIGHT][WIDTH])
 {
     for (int i = 0; i < WIDTH; i++)
     {
         if (board[0][i] == EMPTY) break;
 
         // if its reached the end of the board.
-        if (i == WIDTH - 1) return DRAW;
+        if (i == WIDTH - 1) return TIE;
     }
 
     return CONTINUE;
@@ -179,22 +190,25 @@ int right_diagonal_win_state(char board[HEIGHT][WIDTH], char player)
 int check_game_state(char board[HEIGHT][WIDTH])
 {
     // check for draw
-    if (draw_state(board) == DRAW)
+    if (tie_state(board) == TIE)
     {
+        draw_board(board);
         finished_game_message("DRAW");
-        return DRAW;
+        return TIE;
     }
 
     // check if blue won...
-    if (vertical_win_state(board, BLUE) == WIN || horizontal_win_state(board, BLUE) == WIN || left_diagonal_win_state(board, BLUE) == WIN || right_diagonal_win_state(board, BLUE) == WIN)
+    if (vertical_win_state(board, YELLOW) == WIN || horizontal_win_state(board, YELLOW) == WIN || left_diagonal_win_state(board, YELLOW) == WIN || right_diagonal_win_state(board, YELLOW) == WIN)
     {
-        finished_game_message("BLUE WON");
+        draw_board(board);
+        finished_game_message("YELLOW WON");
         return WIN;
     }
 
     // check if red won...
     if (vertical_win_state(board, RED) == WIN || horizontal_win_state(board, RED) == WIN || left_diagonal_win_state(board, RED) == WIN || right_diagonal_win_state(board, RED) == WIN)
     {
+        draw_board(board);
         finished_game_message("RED WON");
         return WIN;
     }
@@ -203,8 +217,16 @@ int check_game_state(char board[HEIGHT][WIDTH])
     return CONTINUE;
 }
 
-void start_game()
+void start_game(int game_mode)
 {
+    // create array of counters. Set turn to PLAYER_1.
+    char counter_array[] = {YELLOW, RED};
+    int turn = PLAYER_1;
+
+    // set cursor position.
+    int cursor_pos_y = HEIGHT - 1;
+    int cursor_pos_x = 0;
+
     // create the board array.
     char board_grid[HEIGHT][WIDTH];
 
@@ -212,17 +234,10 @@ void start_game()
     create_new_board(board_grid);
 
     // draw that empty board.
-    draw_board(board_grid);
+    show_cursor_position(board_grid, counter_array[turn], cursor_pos_y, cursor_pos_x);
 
-    // create array of players. Set turn to PLAYER_1.
-    char player_array[] = {BLUE, RED};
-    int turn = PLAYER_1;
-
-    // set cursor position.
-    int cursor_pos_y = HEIGHT - 1;
-    int cursor_pos_x = 0;
-
-    while (appletMainLoop())
+    // exit if state is not continue (win / draw).
+    while (check_game_state(board_grid) == CONTINUE)
     {
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
         hidScanInput();
@@ -238,7 +253,7 @@ void start_game()
                 cursor_pos_y = is_space_empty(board_grid, cursor_pos_x);
             }
 
-            show_cursor_position(board_grid, player_array[turn], cursor_pos_y, cursor_pos_x);
+            show_cursor_position(board_grid, counter_array[turn], cursor_pos_y, cursor_pos_x);
         }
 
         if (kDown & KEY_RIGHT)
@@ -252,7 +267,7 @@ void start_game()
                 cursor_pos_y = is_space_empty(board_grid, cursor_pos_x);
             }
 
-            show_cursor_position(board_grid, player_array[turn], cursor_pos_y, cursor_pos_x);
+            show_cursor_position(board_grid, counter_array[turn], cursor_pos_y, cursor_pos_x);
         }
 
         if (kDown & KEY_A)
@@ -262,18 +277,15 @@ void start_game()
             // if the current_pos is empty, add a counter.
             if (cursor_pos_y != NO_EMPTY)
             {
-                add_counter_to_board(board_grid, player_array[turn], cursor_pos_y, cursor_pos_x);
+                add_counter_to_board(board_grid, counter_array[turn], cursor_pos_y, cursor_pos_x);
                 if (turn == PLAYER_1) turn = PLAYER_2;
                 else turn = PLAYER_1;
-
-                // exit if state is not continue (win / draw).
-                if (check_game_state(board_grid) != CONTINUE) break;
             }
         }
 
         if (kDown & KEY_PLUS)
         {
-            //in_game menu
+            //game_options_menu(board_grid);
             break;
         }
     }

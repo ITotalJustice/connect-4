@@ -4,14 +4,13 @@
 #define HEIGHT      6
 #define WIDTH       7
 
-#define CONTINUE    0
-#define WIN         1
-#define DRAW        2
+#define P_V_P       0
+#define P_V_CPU     1
 
 void create_new_board(char board[HEIGHT][WIDTH]);
 void draw_board(char board[HEIGHT][WIDTH]);
 void add_counter_to_board(char board[HEIGHT][WIDTH], char player, int pos_y, int pos_x);
 int is_space_empty(char board[HEIGHT][WIDTH], int pos_x);
-void start_game();
+void start_game(int game_mode);
 
 #endif
