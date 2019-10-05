@@ -6,21 +6,27 @@
 #include "sdl.h"
 #include "hid.h"
 
-#define YELLOW      'X'
-#define RED         'O'
-#define EMPTY       ' '
+#define YELLOW          'X'
+#define RED             'O'
+#define EMPTY           ' '
 
-#define CONTINUE    0
-#define WIN         1
-#define TIE         2
+#define CONTINUE        0
+#define WIN             1
+#define TIE             2
 
-#define PLAYER_1    0
-#define PLAYER_2    1
+#define PLAYER_1        0
+#define PLAYER_2        1
 
-#define RIGHT       0
-#define LEFT        1
+#define RIGHT           0
+#define LEFT            1
 
-#define NO_EMPTY    10
+#define NO_EMPTY        10
+
+#define COUNTER_SIZE    50  //sqaure for now
+#define BOARD_X         270
+#define BOARD_Y         120
+#define VERTICAL_NL     75
+#define HORIZONTAL_NL   100
 
 
 void create_new_board(char board[HEIGHT][WIDTH])
@@ -38,25 +44,26 @@ void draw_board(char board[HEIGHT][WIDTH])
 {
     SDL_ClearRenderer();
 
-    SDL_DrawShape(grey, 25, 25, 200, 40);
+    SDL_DrawShape(grey, 20, 22, 200, 40);
     SDL_DrawText(fntSmall, 25, 25, yellow, "PLAYER 1");
-    SDL_DrawShape(grey, 25, 75, 200, 40);
+    SDL_DrawShape(grey, 20, 72, 200, 40);
     SDL_DrawText(fntSmall, 25, 75, red, "PLAYER 2");
 
-    SDL_DrawShape(blue, 280, 120, 700, 470);
+    // the blue board.
+    SDL_DrawShape(blue, BOARD_X, BOARD_Y, (100*WIDTH)+20, (75*HEIGHT)+20);
 
-    for (int i = 0, nl = 140; i < HEIGHT; i++, nl+=75)
+    for (int i = 0, hl = BOARD_Y+20; i < HEIGHT; i++, hl+=VERTICAL_NL)
     {
-        for (int j = 0, wl = 300; j < WIDTH; j++, wl+=100)
+        for (int j = 0, wl = BOARD_X+30; j < WIDTH; j++, wl+=HORIZONTAL_NL)
         {
             if (board[i][j] == EMPTY)
-            SDL_DrawShape(white, wl, nl, 50, 50);
+            SDL_DrawShape(white, wl, hl, COUNTER_SIZE, COUNTER_SIZE);
 
             else if (board[i][j] == YELLOW)
-            SDL_DrawShape(yellow, wl, nl, 50, 50);
+            SDL_DrawShape(yellow, wl, hl, COUNTER_SIZE, COUNTER_SIZE);
 
             else
-            SDL_DrawShape(red, wl, nl, 50, 50);
+            SDL_DrawShape(red, wl, hl, COUNTER_SIZE, COUNTER_SIZE);
         }
     }
 }

@@ -116,6 +116,14 @@ void SDL_DrawShape(int colour, int x, int y, int w, int h)
     SDL_RenderFillRect(main_renderer, &pos);
 }
 
+void SDL_DrawCircle(int colour, int x, int y, int r)
+{
+    SDL_Colour col = SDL_GetColour(colour);
+    SDL_SetRenderDrawColor(main_renderer, col.r, col.g, col.b, col.a);
+
+    //TODO//
+}
+
 void SDL_LoadFonts()
 {
     // Get the fonts from system
@@ -131,20 +139,23 @@ void SDL_LoadFonts()
     fntButtonBig    = TTF_OpenFontRW(SDL_RWFromMem(button_data.address, button_data.size), 1, 36);
 }
 
-void SDL_LoadTextures()
-{
-    SDL_ImageLoad(&black_background,    "romfs:/data/black_blackground.png");
-}
-
-void SDL_DestroyTextures()
+void SDL_CloseFonts()
 {
     TTF_CloseFont(fntSmall);
     TTF_CloseFont(fntMedium);
     TTF_CloseFont(fntLarge);
     TTF_CloseFont(fntButton);
     TTF_CloseFont(fntButtonBig);
+}
 
-    SDL_DestroyTexture(black_background);
+void SDL_LoadTextures()
+{
+    
+}
+
+void SDL_DestroyTextures()
+{
+
 }
 
 void SDL_ClearRenderer()
@@ -176,6 +187,7 @@ void sdlInit()
 
 void sdlExit()
 {
+    SDL_CloseFonts();
     SDL_DestroyTextures();
     SDL_DestroyRenderer(main_renderer);
     SDL_DestroyWindow(main_window);

@@ -63,8 +63,6 @@
 #define BUTTON_R3           0xE105
 
 TTF_Font *fntSmall, *fntMedium, *fntLarge, *fntButton, *fntButtonBig;
-SDL_Texture *black_background;
-
 
 SDL_Colour SDL_GetColour(int colour_option);                                            //pass the name of colour, returns the colour
 SDL_Window* SDL_GetWindow(void);                                                        //get sdl window
@@ -77,8 +75,10 @@ void SDL_DrawButton(TTF_Font *font, u_int16_t btn, int x, int y, int colour);   
 void SDL_DrawImage(SDL_Texture *texture, int x, int y);                                 //draw image to screen from texture
 void SDL_DrawImageScale(SDL_Texture *texture, int x, int y, int w, int h);              //scale the image drawn to screen
 void SDL_DrawShape(int colour, int x, int y, int w, int h);                             //draw shap (rect)
+void SDL_DrawCircle(int colour, int x, int y, int r);
 
 void SDL_LoadFonts(void);                                                               //load all fonts
+void SDL_CloseFonts(void);                                                              //close all loaded fonts
 void SDL_LoadTextures(void);                                                            //load all textures
 void SDL_DestroyTextures(void);                                                         //destroy all textures
 
